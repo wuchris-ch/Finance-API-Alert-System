@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  stock-alerts:
+    build: .
+    container_name: stock-alerts
+    restart: unless-stopped
+    volumes:
+      - ./alerts.db:/app/alerts.db
+      - ./config.py:/app/config.py
+    environment:
+      # Replace with your actual Telegram credentials
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN:-YOUR_BOT_TOKEN_HERE}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-YOUR_CHAT_ID_HERE}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sqlite3; conn = sqlite3.connect('alerts.db'); conn.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s 
