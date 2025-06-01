@@ -132,7 +132,12 @@ def get_stock_price(ticker):
         if config.DEMO_MODE:
             # Return mock data for demo
             import random
-            base_prices = {"AAPL": 190, "TSLA": 250, "SPY": 470, "NVDA": 140}
+            base_prices = {
+                # Stocks
+                "AAPL": 190, "TSLA": 250, "SPY": 470, "NVDA": 140,
+                # Cryptocurrencies
+                "BTC-USD": 95000, "LTC-USD": 110, "BCH-USD": 450
+            }
             base = base_prices.get(ticker, 100)
             return base + random.uniform(-10, 10)
         

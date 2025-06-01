@@ -24,9 +24,15 @@ def run_demo():
     
     # Set thresholds that will definitely trigger with our mock data
     config.WATCHLIST = {
-        "AAPL": {"upper": 185.00, "lower": 195.00},  # Will trigger lower alert
-        "TSLA": {"upper": 245.00, "lower": 255.00},  # Will trigger lower alert  
-        "NVDA": {"upper": 135.00, "lower": 145.00},  # Will trigger lower alert
+        # Stocks - Expanded demo ranges
+        "AAPL": {"upper": 185.00, "lower": 195.00},    # Will trigger alerts with mock ~190
+        "TSLA": {"upper": 245.00, "lower": 255.00},    # Will trigger alerts with mock ~250  
+        "NVDA": {"upper": 135.00, "lower": 145.00},    # Will trigger alerts with mock ~140
+        
+        # Cryptocurrencies - Expanded demo ranges
+        "BTC-USD": {"upper": 94000.00, "lower": 96000.00},    # Will trigger with mock ~95k
+        "LTC-USD": {"upper": 105.00, "lower": 115.00},        # Will trigger with mock ~110
+        "BCH-USD": {"upper": 445.00, "lower": 455.00},        # Will trigger with mock ~450
     }
     
     print(f"📊 Demo watchlist: {list(config.WATCHLIST.keys())}")

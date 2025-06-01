@@ -3,14 +3,20 @@
 # 1) Which symbols to track, and at what thresholds (you can expand this)
 #    Format: { "TICKER": { "upper": float_or_None, "lower": float_or_None } }
 WATCHLIST = {
-    "AAPL": {"upper": 200.00, "lower": 175.00},
-    "TSLA": {"upper": 300.00, "lower": 200.00},
-    "SPY": {"upper": 500.00, "lower": 450.00},
-    "NVDA": {"upper": 150.00, "lower": 120.00}
+    # Stocks - Expanded ranges for more realistic monitoring
+    "AAPL": {"upper": 220.00, "lower": 180.00},    # Wider $40 range
+    "TSLA": {"upper": 400.00, "lower": 250.00},    # Wider $150 range  
+    "SPY": {"upper": 620.00, "lower": 550.00},     # Wider $70 range
+    "NVDA": {"upper": 180.00, "lower": 120.00},    # Wider $60 range
+    
+    # Cryptocurrencies - Much wider ranges for volatility
+    "BTC-USD": {"upper": 110000.00, "lower": 85000.00},    # $25k range for Bitcoin
+    "LTC-USD": {"upper": 130.00, "lower": 70.00},          # $60 range for Litecoin
+    "BCH-USD": {"upper": 550.00, "lower": 350.00},         # $200 range for Bitcoin Cash
 }
 
-# 2) Polling interval (in seconds)
-POLL_INTERVAL = 60  # every 1 minute for demo purposes (change to 300 for production)
+# 2) Polling interval (in seconds) - Updated to 10 seconds for frequent monitoring
+POLL_INTERVAL = 10  # Check every 10 seconds for real-time monitoring
 
 # 3) Telegram Bot settings
 # IMPORTANT: Replace these with your actual bot token and chat ID
