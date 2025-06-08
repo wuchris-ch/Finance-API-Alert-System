@@ -3,7 +3,7 @@
 # 1) Which symbols to track, and at what thresholds (you can expand this)
 #    Format: { "TICKER": { "upper": float_or_None, "lower": float_or_None } }
 WATCHLIST = {
-    # Stocks - Expanded ranges for more realistic monitoring
+    # Stocks - Normal monitoring ranges
     "AAPL": {"upper": 220.00, "lower": 180.00},    # Wider $40 range
     "TSLA": {"upper": 400.00, "lower": 250.00},    # Wider $150 range  
     "SPY": {"upper": 620.00, "lower": 550.00},     # Wider $70 range
@@ -23,8 +23,12 @@ POLL_INTERVAL = 10  # Check every 10 seconds for real-time monitoring
 # To get these:
 # 1. Message @BotFather on Telegram to create a new bot
 # 2. Get your chat ID by messaging @userinfobot
-TELEGRAM_TOKEN = "YOUR_BOT_TOKEN_HERE"  # replace with your Bot token
-TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE"  # replace with your chat ID (can be negative for groups)
+TELEGRAM_TOKEN = "8098813277:AAF68D6xE3V9UroPCf6Z5h6dnKsb0d7QF9s"  # Replace with your actual bot token from BotFather
+TELEGRAM_CHAT_ID = "5324061213"  # Replace with your actual chat ID from @userinfobot
+
+# Example of what they should look like:
+# TELEGRAM_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
+# TELEGRAM_CHAT_ID = "123456789"  # Can be negative for groups: "-123456789"
 
 # 4) Demo mode - set to True to use mock data for testing
 DEMO_MODE = False
