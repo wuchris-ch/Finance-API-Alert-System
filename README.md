@@ -1,6 +1,6 @@
 # 📈 Stock Price Alert System
 
-A simple, lightweight stock price monitoring system that tracks your favorite stocks and sends alerts when prices cross your defined thresholds. Built with Python, SQLite, and optional Telegram notifications.
+A simple, lightweight stock price monitoring system that tracks your favorite stocks and sends alerts when prices cross your defined thresholds using LLM. Built with Python, SQLite, and optional Telegram notifications.
 
 ## ✨ Features
 
