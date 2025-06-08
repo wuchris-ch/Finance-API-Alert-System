@@ -1,4 +1,9 @@
 # config.py
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # 1) Which symbols to track, and at what thresholds (you can expand this)
 #    Format: { "TICKER": { "upper": float_or_None, "lower": float_or_None } }
@@ -19,19 +24,39 @@ WATCHLIST = {
 POLL_INTERVAL = 10  # Check every 10 seconds for real-time monitoring
 
 # 3) Telegram Bot settings
-# IMPORTANT: Replace these with your actual bot token and chat ID
+# IMPORTANT: Set these in your .env file
 # To get these:
 # 1. Message @BotFather on Telegram to create a new bot
 # 2. Get your chat ID by messaging @userinfobot
-TELEGRAM_TOKEN = "8098813277:AAF68D6xE3V9UroPCf6Z5h6dnKsb0d7QF9s"  # Replace with your actual bot token from BotFather
-TELEGRAM_CHAT_ID = "5324061213"  # Replace with your actual chat ID from @userinfobot
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")  # Loaded from .env file
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Loaded from .env file
 
 # Example of what they should look like:
 # TELEGRAM_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789"
 # TELEGRAM_CHAT_ID = "123456789"  # Can be negative for groups: "-123456789"
 
-# 4) Demo mode - set to True to use mock data for testing
+# 4) ntfy.sh settings
+# IMPORTANT: Set these in your .env file
+# To use ntfy.sh:
+# 1. Choose a unique topic name (e.g., "your-username-stock-alerts-xyz123")
+# 2. Optionally set up a custom ntfy.sh server URL (default is ntfy.sh)
+# 3. Subscribe to your topic at https://ntfy.sh/your-topic-name
+NTFY_ENABLED = True  # Set to True to enable ntfy.sh notifications
+NTFY_TOPIC = os.getenv("NTFY_TOPIC", "stock-alerts-api-system-123")  # Loaded from .env file with fallback
+NTFY_SERVER = os.getenv("NTFY_SERVER", "https://ntfy.sh")  # Loaded from .env file with fallback
+
+# Example of custom ntfy.sh setup:
+# NTFY_ENABLED = True
+# NTFY_TOPIC = "my-unique-stock-alerts-xyz789"
+# NTFY_SERVER = "https://ntfy.sh"  # or your own server: "https://my-ntfy-server.com"
+
+# 5) Notification preferences
+# You can enable multiple notification methods simultaneously
+ENABLE_TELEGRAM = True   # Enable/disable Telegram notifications
+ENABLE_NTFY = True       # Enable/disable ntfy.sh notifications
+
+# 6) Demo mode - set to True to use mock data for testing
 DEMO_MODE = False
 
-# 5) Enable console notifications if Telegram is not configured
+# 7) Enable console notifications if other methods are not configured
 CONSOLE_NOTIFICATIONS = True 
