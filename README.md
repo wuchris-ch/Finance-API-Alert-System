@@ -19,9 +19,16 @@ A simple, lightweight stock price monitoring system that tracks your favorite st
 ```bash
 git clone <your-repo>
 cd stock-alert-system
+
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+
+# Install dependencies with uv
+uv pip install -e .
 ```
 
 ### 2. Configure Your Watchlist

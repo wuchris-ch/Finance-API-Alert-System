@@ -1,0 +1,16 @@
+[project]
+name = "api-alert-system"
+version = "0.1.0"
+description = "Stock Alert System with Telegram Notifications"
+requires-python = ">=3.8"
+dependencies = [
+    "yfinance>=0.2.28",
+    "python-telegram-bot>=20.0",
+    "schedule>=1.2.0",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build" 
