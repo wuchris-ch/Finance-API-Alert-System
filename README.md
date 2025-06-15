@@ -1,12 +1,12 @@
 # 📈 Stock Price Alert System
 
-A simple, lightweight stock price monitoring system that tracks your favorite stocks and sends alerts when prices cross your defined thresholds using LLM. Built with Python, SQLite, and optional Telegram notifications.
+A simple, lightweight stock price monitoring system that tracks your favorite stocks and sends alerts when prices cross your defined thresholds using LLM. Built with Python, PostgreSQL, and optional Telegram notifications.
 
 ## ✨ Features
 
 - 📊 **Real-time Stock Monitoring**: Uses Yahoo Finance API via `yfinance`
 - 🚨 **Customizable Alerts**: Set upper and lower price thresholds
-- 💾 **Historical Data**: SQLite database stores all price history
+- 💾 **Historical Data**: PostgreSQL database stores all price history
 - 📱 **Multiple Notifications**: Telegram bot + console notifications
 - 🐳 **Docker Ready**: Easy containerized deployment
 - 🎬 **Demo Mode**: Test with mock data before going live
@@ -43,7 +43,25 @@ WATCHLIST = {
 }
 ```
 
-### 3. Run the System
+### 3. Set Up PostgreSQL
+
+Create a `.env` file with your PostgreSQL credentials:
+
+```bash
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=stock_alerts
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_password_here
+```
+
+Initialize the database:
+
+```bash
+python setup_db.py
+```
+
+### 4. Run the System
 
 ```bash
 # Start monitoring (uses console notifications by default)
@@ -97,7 +115,11 @@ docker build -t stock-alert .
 # Run with environment variables
 docker run -d \
   --name stock-alerts \
-  -v $(pwd)/alerts.db:/app/alerts.db \
+  -e POSTGRES_HOST=your_host \
+  -e POSTGRES_PORT=5432 \
+  -e POSTGRES_DB=stock_alerts \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=your_password \
   -e TELEGRAM_TOKEN="your_token_here" \
   -e TELEGRAM_CHAT_ID="your_chat_id" \
   stock-alert
@@ -114,10 +136,12 @@ services:
     build: .
     container_name: stock-alerts
     restart: unless-stopped
-    volumes:
-      - ./alerts.db:/app/alerts.db
-      - ./config.py:/app/config.py
     environment:
+      - POSTGRES_HOST=your_host
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=stock_alerts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=your_password
       - TELEGRAM_TOKEN=your_token_here
       - TELEGRAM_CHAT_ID=your_chat_id
 ```
@@ -140,6 +164,18 @@ docker-compose up -d
 | `DEMO_MODE` | Use mock data for testing | False |
 | `CONSOLE_NOTIFICATIONS` | Show alerts in console | True |
 
+### PostgreSQL Configuration
+
+The following environment variables are required:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `POSTGRES_HOST` | PostgreSQL server host | localhost |
+| `POSTGRES_PORT` | PostgreSQL server port | 5432 |
+| `POSTGRES_DB` | Database name | stock_alerts |
+| `POSTGRES_USER` | Database user | postgres |
+| `POSTGRES_PASSWORD` | Database password | postgres |
+
 ### Threshold Format
 
 ```python
@@ -154,21 +190,21 @@ WATCHLIST = {
 
 ## 📊 Database Schema
 
-The system creates `alerts.db` with two tables:
+The system uses PostgreSQL with two tables:
 
 ### `price_history`
-- `id`: Auto-increment primary key
-- `ticker`: Stock symbol
-- `fetched_at`: Timestamp (UTC)
-- `price`: Stock price
+- `id`: SERIAL PRIMARY KEY
+- `ticker`: VARCHAR(10) NOT NULL
+- `fetched_at`: TIMESTAMP NOT NULL
+- `price`: DECIMAL(10,2) NOT NULL
 
 ### `alert_history`
-- `id`: Auto-increment primary key
-- `ticker`: Stock symbol
-- `alert_type`: "upper" or "lower"
-- `price`: Price that triggered alert
-- `threshold`: The threshold that was crossed
-- `sent_at`: When alert was sent
+- `id`: SERIAL PRIMARY KEY
+- `ticker`: VARCHAR(10) NOT NULL
+- `alert_type`: VARCHAR(10) NOT NULL
+- `price`: DECIMAL(10,2) NOT NULL
+- `threshold`: DECIMAL(10,2) NOT NULL
+- `sent_at`: TIMESTAMP NOT NULL
 
 ## 🔧 Troubleshooting
 
@@ -184,9 +220,14 @@ The system creates `alerts.db` with two tables:
 - Make sure you've messaged your bot at least once
 - Check that chat ID is correct (can be negative for groups)
 
+**PostgreSQL connection issues**
+- Verify your PostgreSQL server is running
+- Check your database credentials in `.env`
+- Ensure the database and tables are created (run `setup_db.py`)
+
 **Import errors**
 - Make sure you're in the virtual environment
-- Run `pip install -r requirements.txt` again
+- Run `uv pip install -e .` again
 
 ### Testing Telegram
 
@@ -259,15 +300,21 @@ if latest_price > previous_price * 1.05:  # 5% increase
 
 ```python
 # Get price history for analysis
-import sqlite3
-conn = sqlite3.connect("alerts.db")
-c = conn.cursor()
+import psycopg2
+conn = psycopg2.connect(
+    host=config.POSTGRES_HOST,
+    port=config.POSTGRES_PORT,
+    database=config.POSTGRES_DB,
+    user=config.POSTGRES_USER,
+    password=config.POSTGRES_PASSWORD
+)
+cur = conn.cursor()
 
 # Average price last 24 hours
-c.execute("""
+cur.execute("""
     SELECT ticker, AVG(price) 
     FROM price_history 
-    WHERE fetched_at > datetime('now', '-1 day')
+    WHERE fetched_at > NOW() - INTERVAL '1 day'
     GROUP BY ticker
 """)
 ```
