@@ -1,7 +1,8 @@
 # alert_bot_simple.py
 # Simple version that sends price updates to Telegram every 10 seconds
 
-import sqlite3
+import psycopg2
+from psycopg2.extras import DictCursor
 import time
 import requests
 from datetime import datetime
@@ -25,25 +26,49 @@ if hasattr(config, 'TELEGRAM_TOKEN') and hasattr(config, 'TELEGRAM_CHAT_ID'):
         print("⚠️  Telegram credentials not configured. Using console notifications.")
 
 # -----------------------------------------------------------------------------
-# 2) Initialize SQLite and ensure table exists
+# 2) Initialize PostgreSQL and ensure table exists
 # -----------------------------------------------------------------------------
-def init_database():
-    conn = sqlite3.connect("alerts.db")
-    c = conn.cursor()
-    c.execute(
-        """
-        CREATE TABLE IF NOT EXISTS price_history (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            ticker      TEXT NOT NULL,
-            fetched_at  DATETIME NOT NULL,
-            price       REAL NOT NULL
-        )
-        """
+def get_db_connection():
+    """Create a new database connection"""
+    return psycopg2.connect(
+        host=config.POSTGRES_HOST,
+        port=config.POSTGRES_PORT,
+        database=config.POSTGRES_DB,
+        user=config.POSTGRES_USER,
+        password=config.POSTGRES_PASSWORD
     )
-    conn.commit()
-    return conn, c
 
-conn, c = init_database()
+def init_database():
+    """Initialize database and create tables if they don't exist"""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Create price_history table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS price_history (
+            id          SERIAL PRIMARY KEY,
+            ticker      VARCHAR(10) NOT NULL,
+            fetched_at  TIMESTAMP NOT NULL,
+            price       DECIMAL(10,2) NOT NULL
+        )
+    """)
+    
+    # Create alert_history table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS alert_history (
+            id          SERIAL PRIMARY KEY,
+            ticker      VARCHAR(10) NOT NULL,
+            alert_type  VARCHAR(10) NOT NULL,
+            price       DECIMAL(10,2) NOT NULL,
+            threshold   DECIMAL(10,2) NOT NULL,
+            sent_at     TIMESTAMP NOT NULL
+        )
+    """)
+    
+    conn.commit()
+    return conn, cur
+
+conn, cur = init_database()
 
 # -----------------------------------------------------------------------------
 # 3) Telegram Functions
@@ -111,7 +136,7 @@ def get_stock_price(ticker):
 # -----------------------------------------------------------------------------
 def check_prices_and_send_update():
     """Check prices and send consolidated update to Telegram"""
-    now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    now = datetime.utcnow()
     print(f"\n📊 Checking prices at {now}")
     print("-" * 50)
     
@@ -124,9 +149,9 @@ def check_prices_and_send_update():
         if latest_price is None:
             continue
         
-        # Insert into SQLite
-        c.execute(
-            "INSERT INTO price_history (ticker, fetched_at, price) VALUES (?, ?, ?)",
+        # Insert into PostgreSQL
+        cur.execute(
+            "INSERT INTO price_history (ticker, fetched_at, price) VALUES (%s, %s, %s)",
             (ticker, now, latest_price),
         )
         conn.commit()
@@ -164,12 +189,12 @@ def show_recent_history(limit=5):
     print(f"\n📈 Recent Price History (Last {limit} entries):")
     print("-" * 70)
     
-    c.execute(
-        "SELECT ticker, fetched_at, price FROM price_history ORDER BY fetched_at DESC LIMIT ?",
+    cur.execute(
+        "SELECT ticker, fetched_at, price FROM price_history ORDER BY fetched_at DESC LIMIT %s",
         (limit,)
     )
     
-    for row in c.fetchall():
+    for row in cur.fetchall():
         ticker, fetched_at, price = row
         print(f"{ticker:6} | {fetched_at} | ${price:8.2f}")
 
@@ -185,6 +210,7 @@ if __name__ == "__main__":
     print(f"⏱️  Update interval: {config.POLL_INTERVAL} seconds")
     print(f"📱 Telegram configured: {'✅' if telegram_configured else '❌'}")
     print(f"🧪 Demo mode: {'✅' if config.DEMO_MODE else '❌'}")
+    print(f"🗄️  Database: PostgreSQL at {config.POSTGRES_HOST}:{config.POSTGRES_PORT}")
     
     if config.DEMO_MODE:
         print("\n⚠️  DEMO MODE ENABLED - Using mock price data")
@@ -212,6 +238,7 @@ if __name__ == "__main__":
         print("\n\n👋 Stopping price update system...")
         print("📊 Final statistics:")
         show_recent_history(10)
+        cur.close()
         conn.close()
         print("✅ Database connection closed. Goodbye!")
         sys.exit(0) 

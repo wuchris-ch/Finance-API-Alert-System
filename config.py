@@ -60,3 +60,18 @@ DEMO_MODE = False
 
 # 7) Enable console notifications if other methods are not configured
 CONSOLE_NOTIFICATIONS = True 
+
+# 8) PostgreSQL Database Configuration
+# IMPORTANT: Set these in your .env file
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "stock_alerts")
+POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
+
+# Example of what they should look like in .env:
+# POSTGRES_HOST=localhost
+# POSTGRES_PORT=5432
+# POSTGRES_DB=stock_alerts
+# POSTGRES_USER=postgres
+# POSTGRES_PASSWORD=your_secure_password 
