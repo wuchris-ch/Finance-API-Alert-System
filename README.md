@@ -12,6 +12,74 @@ A simple, lightweight stock price monitoring system that tracks your favorite st
 - 🎬 **Demo Mode**: Test with mock data before going live
 - 📈 **Alert History**: Track all alerts sent over time
 
+## 🏗️ System Architecture
+
+```mermaid
+graph TB
+    subgraph "External Services"
+        YF[Yahoo Finance API]
+        TG[Telegram API]
+    end
+
+    subgraph "Core System"
+        MCP[Model Context Protocol]
+        AB[Alert Bot]
+        DB[(PostgreSQL)]
+    end
+
+    subgraph "Data Flow"
+        YF -->|Real-time Prices| AB
+        AB -->|Price Updates| DB
+        AB -->|Threshold Checks| MCP
+        MCP -->|Alert Decisions| AB
+        AB -->|Notifications| TG
+    end
+
+    subgraph "Configuration"
+        CFG[config.py]
+        ENV[.env]
+    end
+
+    CFG -->|Watchlist & Settings| AB
+    ENV -->|Credentials| AB
+    ENV -->|DB Config| DB
+
+    style YF fill:#f9f,stroke:#333,stroke-width:2px
+    style TG fill:#f9f,stroke:#333,stroke-width:2px
+    style MCP fill:#bbf,stroke:#333,stroke-width:2px
+    style AB fill:#bfb,stroke:#333,stroke-width:2px
+    style DB fill:#fbb,stroke:#333,stroke-width:2px
+    style CFG fill:#fbf,stroke:#333,stroke-width:2px
+    style ENV fill:#fbf,stroke:#333,stroke-width:2px
+```
+
+The system architecture consists of several key components:
+
+1. **Model Context Protocol (MCP)**: The brain of the system that handles:
+   - Stock threshold management
+   - Alert decision making
+   - System state tracking
+   - LLM interaction interface
+
+2. **Alert Bot**: The main monitoring service that:
+   - Fetches real-time stock data
+   - Manages database operations
+   - Handles notification dispatch
+   - Coordinates with MCP for decisions
+
+3. **Database**: PostgreSQL stores:
+   - Price history
+   - Alert history
+   - System state
+
+4. **External Services**:
+   - Yahoo Finance API for real-time data
+   - Telegram API for notifications
+
+5. **Configuration**:
+   - `config.py` for system settings
+   - `.env` for sensitive credentials
+
 ## 🚀 Quick Start
 
 ### 1. Clone and Install
