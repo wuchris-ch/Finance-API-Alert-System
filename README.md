@@ -29,10 +29,11 @@ graph TB
 
     subgraph "Data Flow"
         YF -->|Real-time Prices| AB
-        AB -->|Price Updates| DB
-        AB -->|Threshold Checks| MCP
+        AB -->|Store Price Data| DB
+        AB -->|Check Thresholds| MCP
         MCP -->|Alert Decisions| AB
-        AB -->|Notifications| TG
+        AB -->|Send Alerts| TG
+        AB -->|Log Alerts| DB
     end
 
     subgraph "Configuration"
@@ -62,10 +63,11 @@ The system architecture consists of several key components:
    - LLM interaction interface
 
 2. **Alert Bot**: The main monitoring service that:
-   - Fetches real-time stock data
+   - Fetches real-time stock data from Yahoo Finance
    - Manages database operations
-   - Handles notification dispatch
-   - Coordinates with MCP for decisions
+   - Coordinates with MCP for alert decisions
+   - Directly sends notifications to Telegram and other services
+   - Logs alerts to the database
 
 3. **Database**: PostgreSQL stores:
    - Price history
