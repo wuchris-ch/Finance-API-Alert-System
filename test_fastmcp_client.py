@@ -1,6 +1,6 @@
 """
 Test client for the Stock Alert FastMCP Server
-Demonstrates how to interact with the MCP server programmatically.
+Demonstrates how to interact with the MCP server programmatically via HTTP.
 """
 
 import asyncio
@@ -8,11 +8,11 @@ from fastmcp import Client
 import json
 
 async def test_stock_alert_mcp():
-    """Test the Stock Alert MCP server"""
+    """Test the Stock Alert MCP server via HTTP"""
     
-    # Connect to the MCP server using a single string command
-    async with Client("python stock_alert_mcp_server.py") as client:
-        print("🔗 Connected to Stock Alert MCP Server")
+    # Connect to the MCP server via HTTP
+    async with Client("http://127.0.0.1:8000/mcp") as client:
+        print("🔗 Connected to Stock Alert MCP Server via HTTP")
         
         # Test 1: Get watchlist status
         print("\n📋 Test 1: Getting watchlist status")
@@ -57,7 +57,7 @@ async def test_stock_alert_mcp():
         
         # Test 7: Get system configuration
         print("\n⚙️ Test 7: Getting system configuration")
-        config = await client.read_resource("system_config")
+        config = await client.read_resource("mcp://stock-alerts/system_config")
         print(config.content)
         
         print("\n✅ All tests completed!")

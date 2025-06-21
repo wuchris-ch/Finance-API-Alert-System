@@ -1,61 +1,55 @@
 """
-Simple test script for the Stock Alert MCP Server
+Professional test for Stock Alert MCP Server using HTTP transport.
 """
 
 import asyncio
+import subprocess
+import time
 from fastmcp import Client
-import json
 
-async def quick_test():
-    """Quick test of the MCP server"""
-    print("🧪 Testing Stock Alert MCP Server...")
+async def main():
+    print("🧪 Testing Stock Alert MCP Server with HTTP transport...")
+    
+    # Start the server with HTTP transport
+    print("🚀 Starting MCP server with HTTP transport...")
+    server_process = subprocess.Popen([
+        "python", "stock_alert_mcp_server.py",
+        "--transport", "streamable-http",
+        "--host", "127.0.0.1",
+        "--port", "8000"
+    ])
     
     try:
-        # Connect to the MCP server using a single string command
-        async with Client("python stock_alert_mcp_server.py") as client:
-            print("✅ Connected to MCP server")
+        # Wait for server to start
+        print("⏳ Waiting for server to start...")
+        time.sleep(3)
+        
+        # Connect to the server via HTTP
+        print("🔗 Connecting to MCP server via HTTP...")
+        async with Client("http://127.0.0.1:8000/mcp") as client:
+            print("✅ Connected to MCP server via HTTP")
             
-            # Test 1: Get watchlist status
-            print("\n📋 Test 1: Getting watchlist status")
+            # List available tools
+            tools = await client.list_tools()
+            print(f"📋 Available tools ({len(tools)}): {[t.name for t in tools]}")
+            
+            # Test a simple tool call
+            print("\n🧪 Testing tool call...")
             result = await client.call_tool("get_watchlist_status")
+            print("✅ Tool call successful:")
             print(result.text)
             
-            # Test 2: Add a stock
-            print("\n➕ Test 2: Adding stock to watchlist")
-            result = await client.call_tool("add_stock_to_watchlist", {
-                "ticker": "TEST",
-                "upper_threshold": 100.0,
-                "lower_threshold": 50.0
-            })
-            print(result.text)
-            
-            # Test 3: Get current prices
-            print("\n📊 Test 3: Getting current prices")
-            result = await client.call_tool("get_current_prices", {
-                "tickers": ["AAPL", "TEST"]
-            })
-            print(result.text)
-            
-            # Test 4: Toggle demo mode
-            print("\n🎬 Test 4: Enabling demo mode")
-            result = await client.call_tool("toggle_demo_mode", {
-                "enabled": True
-            })
-            print(result.text)
-            
-            # Test 5: Check alert conditions
-            print("\n🚨 Test 5: Checking alert conditions")
-            result = await client.call_tool("check_alert_conditions")
-            print(result.text)
-            
-            print("\n✅ All tests completed successfully!")
+            print("\n✅ HTTP transport test completed successfully!")
             
     except Exception as e:
-        print(f"❌ Test failed: {e}")
-        return False
-    
-    return True
+        print(f"❌ HTTP transport test failed: {e}")
+        raise
+    finally:
+        # Clean up server process
+        print("🧹 Cleaning up server process...")
+        server_process.terminate()
+        server_process.wait()
+        print("✅ Server process terminated")
 
 if __name__ == "__main__":
-    success = asyncio.run(quick_test())
-    exit(0 if success else 1) 
+    asyncio.run(main()) 

@@ -422,12 +422,12 @@ async def toggle_demo_mode(
     except Exception as e:
         return f"❌ Error toggling demo mode: {str(e)}"
 
-@mcp.resource
+@mcp.resource("mcp://stock-alerts/watchlist_config")
 async def watchlist_config() -> str:
     """Get current watchlist configuration"""
     return json.dumps(config.WATCHLIST, indent=2)
 
-@mcp.resource
+@mcp.resource("mcp://stock-alerts/system_config")
 async def system_config() -> str:
     """Get current system configuration"""
     config_data = {
@@ -441,4 +441,4 @@ async def system_config() -> str:
 
 # Run the server
 if __name__ == "__main__":
-    mcp.run()  # Default: uses STDIO transport 
+    mcp.run() 
