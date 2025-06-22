@@ -1,86 +1,50 @@
-# 📈 Stock Price Alert System
+# 📈 API Alert System
 
-A simple, lightweight stock price monitoring system that tracks your favorite stocks and sends alerts when prices cross your defined thresholds using LLM. Built with Python, PostgreSQL, and optional Telegram notifications.
+A comprehensive, modular stock price monitoring system that tracks your favorite stocks and sends alerts when prices cross your defined thresholds. Built with Python, PostgreSQL, and multiple notification systems including Telegram and NTFY.
+
+## 🏗️ Project Structure
+
+```
+api-alert-system/
+├── src/
+│   └── api_alert_system/          # Main package
+│       ├── core/                  # Core functionality
+│       │   ├── alert_bot.py       # Main alert bot
+│       │   ├── database.py        # Database operations
+│       │   └── stock_monitor.py   # Stock price monitoring
+│       ├── notifications/         # Notification systems
+│       │   ├── telegram.py        # Telegram notifications
+│       │   ├── ntfy.py           # NTFY notifications
+│       │   └── console.py        # Console notifications
+│       ├── mcp/                  # Model Context Protocol
+│       │   ├── server.py         # MCP server
+│       │   └── client.py         # MCP client
+│       └── utils/                # Utilities
+│           ├── config.py         # Configuration
+│           └── helpers.py        # Helper functions
+├── scripts/                      # Utility scripts
+│   ├── setup_db.py              # Database setup
+│   ├── inspect_db.py            # Database inspection
+│   └── setup.py                 # General setup
+├── tests/                       # Test files
+├── demos/                       # Demo applications
+├── backups/                     # Backup versions
+├── docs/                        # Documentation
+├── docker/                      # Docker files
+├── data/                        # Data files
+└── main.py                      # Main entry point
+```
 
 ## ✨ Features
 
 - 📊 **Real-time Stock Monitoring**: Uses Yahoo Finance API via `yfinance`
 - 🚨 **Customizable Alerts**: Set upper and lower price thresholds
 - 💾 **Historical Data**: PostgreSQL database stores all price history
-- 📱 **Multiple Notifications**: Telegram bot + console notifications
+- 📱 **Multiple Notifications**: Telegram, NTFY, and console notifications
 - 🐳 **Docker Ready**: Easy containerized deployment
 - 🎬 **Demo Mode**: Test with mock data before going live
 - 📈 **Alert History**: Track all alerts sent over time
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TB
-    subgraph "External Services"
-        YF[Yahoo Finance API]
-        TG[Telegram API]
-    end
-
-    subgraph "Core System"
-        MCP[Model Context Protocol]
-        AB[Alert Bot]
-        DB[(PostgreSQL)]
-    end
-
-    subgraph "Data Flow"
-        YF -->|Real-time Prices| AB
-        AB -->|Store Price Data| DB
-        AB -->|Check Thresholds| MCP
-        MCP -->|Alert Decisions| AB
-        AB -->|Send Alerts| TG
-        AB -->|Log Alerts| DB
-    end
-
-    subgraph "Configuration"
-        CFG[config.py]
-        ENV[.env]
-    end
-
-    CFG -->|Watchlist & Settings| AB
-    ENV -->|Credentials| AB
-    ENV -->|DB Config| DB
-
-    style YF fill:#f9f,stroke:#333,stroke-width:2px
-    style TG fill:#f9f,stroke:#333,stroke-width:2px
-    style MCP fill:#bbf,stroke:#333,stroke-width:2px
-    style AB fill:#bfb,stroke:#333,stroke-width:2px
-    style DB fill:#fbb,stroke:#333,stroke-width:2px
-    style CFG fill:#fbf,stroke:#333,stroke-width:2px
-    style ENV fill:#fbf,stroke:#333,stroke-width:2px
-```
-
-The system architecture consists of several key components:
-
-1. **Model Context Protocol (MCP)**: The brain of the system that handles:
-   - Stock threshold management
-   - Alert decision making
-   - System state tracking
-   - LLM interaction interface
-
-2. **Alert Bot**: The main monitoring service that:
-   - Fetches real-time stock data from Yahoo Finance
-   - Manages database operations
-   - Coordinates with MCP for alert decisions
-   - Directly sends notifications to Telegram and other services
-   - Logs alerts to the database
-
-3. **Database**: PostgreSQL stores:
-   - Price history
-   - Alert history
-   - System state
-
-4. **External Services**:
-   - Yahoo Finance API for real-time data
-   - Telegram API for notifications
-
-5. **Configuration**:
-   - `config.py` for system settings
-   - `.env` for sensitive credentials
+- 🔧 **Modular Design**: Clean, maintainable code structure
 
 ## 🚀 Quick Start
 
@@ -88,22 +52,18 @@ The system architecture consists of several key components:
 
 ```bash
 git clone <your-repo>
-cd stock-alert-system
+cd api-alert-system
 
-# Install uv if you haven't already
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install dependencies
+pip install -e .
 
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies with uv
-uv pip install -e .
+# Or install with development dependencies
+pip install -e ".[dev]"
 ```
 
 ### 2. Configure Your Watchlist
 
-Edit `config.py`:
+Edit `src/api_alert_system/utils/config.py`:
 
 ```python
 WATCHLIST = {
@@ -113,37 +73,57 @@ WATCHLIST = {
 }
 ```
 
-### 3. Set Up PostgreSQL
+### 3. Set Up Environment Variables
 
-Create a `.env` file with your PostgreSQL credentials:
+Create a `.env` file:
 
 ```bash
+# PostgreSQL Configuration
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_DB=stock_alerts
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password_here
+
+# Telegram Configuration (Optional)
+TELEGRAM_TOKEN=your_bot_token_here
+TELEGRAM_CHAT_ID=your_chat_id_here
+
+# NTFY Configuration (Optional)
+NTFY_TOPIC=your-unique-topic-name
+NTFY_SERVER=https://ntfy.sh
+
+# System Configuration
+DEMO_MODE=False
+POLL_INTERVAL=10
 ```
 
-Initialize the database:
+### 4. Initialize Database
 
 ```bash
-python setup_db.py
+# Using the script
+python scripts/setup_db.py
+
+# Or using the entry point
+setup-db
 ```
 
-### 4. Run the System
+### 5. Run the System
 
 ```bash
-# Start monitoring (uses console notifications by default)
-python alert_bot.py
+# Using the main entry point
+python main.py
 
-# Or run a quick demo with mock data
-python demo.py
+# Or using the package directly
+python -m api_alert_system.core.alert_bot
+
+# Or using the entry point
+alert-bot
 ```
 
-## 📱 Telegram Setup (Optional)
+## 📱 Notification Setup
 
-To receive alerts via Telegram:
+### Telegram Setup
 
 1. **Create a Bot**:
    - Message [@BotFather](https://t.me/BotFather) on Telegram
@@ -152,255 +132,127 @@ To receive alerts via Telegram:
 
 2. **Get Your Chat ID**:
    - Message [@userinfobot](https://t.me/userinfobot) 
-   - Copy your chat ID (or add bot to group and get group ID)
+   - Copy your chat ID
 
-3. **Update Config**:
-   ```python
-   TELEGRAM_TOKEN = "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-   TELEGRAM_CHAT_ID = "123456789"  # Your user ID or group ID (can be negative)
+3. **Update Environment**:
+   ```bash
+   TELEGRAM_TOKEN=your_bot_token_here
+   TELEGRAM_CHAT_ID=your_chat_id_here
+   ```
+
+### NTFY Setup
+
+1. **Choose a Topic**:
+   - Pick a unique topic name (e.g., "your-username-stock-alerts-xyz123")
+
+2. **Subscribe**:
+   - Visit https://ntfy.sh/your-topic-name
+   - Or use the NTFY app
+
+3. **Update Environment**:
+   ```bash
+   NTFY_TOPIC=your-unique-topic-name
+   NTFY_SERVER=https://ntfy.sh
    ```
 
 ## 🎬 Demo Mode
 
-Try the system with mock data first:
+Try the system with mock data:
 
 ```bash
-python demo.py
-```
+# Enable demo mode in .env
+DEMO_MODE=True
 
-This will:
-- Enable mock price data
-- Set thresholds that trigger alerts
-- Show you how alerts work
-- Display price and alert history
+# Run the system
+python main.py
+```
 
 ## 🐳 Docker Deployment
 
-### Build and Run
+### Using Docker Compose
 
 ```bash
-# Build the image
-docker build -t stock-alert .
-
-# Run with environment variables
-docker run -d \
-  --name stock-alerts \
-  -e POSTGRES_HOST=your_host \
-  -e POSTGRES_PORT=5432 \
-  -e POSTGRES_DB=stock_alerts \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=your_password \
-  -e TELEGRAM_TOKEN="your_token_here" \
-  -e TELEGRAM_CHAT_ID="your_chat_id" \
-  stock-alert
-```
-
-### Docker Compose (Recommended)
-
-Create `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-services:
-  stock-alerts:
-    build: .
-    container_name: stock-alerts
-    restart: unless-stopped
-    environment:
-      - POSTGRES_HOST=your_host
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=stock_alerts
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=your_password
-      - TELEGRAM_TOKEN=your_token_here
-      - TELEGRAM_CHAT_ID=your_chat_id
-```
-
-Run with:
-```bash
+cd docker
 docker-compose up -d
 ```
 
-## ⚙️ Configuration Options
+### Manual Docker Build
 
-### `config.py` Settings
-
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `WATCHLIST` | Dict of tickers and thresholds | See config.py |
-| `POLL_INTERVAL` | Seconds between price checks | 60 |
-| `TELEGRAM_TOKEN` | Your Telegram bot token | Required for Telegram |
-| `TELEGRAM_CHAT_ID` | Your chat/group ID | Required for Telegram |
-| `DEMO_MODE` | Use mock data for testing | False |
-| `CONSOLE_NOTIFICATIONS` | Show alerts in console | True |
-
-### PostgreSQL Configuration
-
-The following environment variables are required:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `POSTGRES_HOST` | PostgreSQL server host | localhost |
-| `POSTGRES_PORT` | PostgreSQL server port | 5432 |
-| `POSTGRES_DB` | Database name | stock_alerts |
-| `POSTGRES_USER` | Database user | postgres |
-| `POSTGRES_PASSWORD` | Database password | postgres |
-
-### Threshold Format
-
-```python
-WATCHLIST = {
-    "TICKER": {
-        "upper": 100.00,  # Alert when price >= this
-        "lower": 80.00,   # Alert when price <= this
-        # Set to None to disable: "upper": None
-    }
-}
-```
-
-## 📊 Database Schema
-
-The system uses PostgreSQL with two tables:
-
-### `price_history`
-- `id`: SERIAL PRIMARY KEY
-- `ticker`: VARCHAR(10) NOT NULL
-- `fetched_at`: TIMESTAMP NOT NULL
-- `price`: DECIMAL(10,2) NOT NULL
-
-### `alert_history`
-- `id`: SERIAL PRIMARY KEY
-- `ticker`: VARCHAR(10) NOT NULL
-- `alert_type`: VARCHAR(10) NOT NULL
-- `price`: DECIMAL(10,2) NOT NULL
-- `threshold`: DECIMAL(10,2) NOT NULL
-- `sent_at`: TIMESTAMP NOT NULL
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**"No data available for TICKER"**
-- Check if ticker symbol is correct
-- Some tickers may not be available outside market hours
-- Try with a major stock like AAPL first
-
-**Telegram bot not working**
-- Verify your bot token is correct
-- Make sure you've messaged your bot at least once
-- Check that chat ID is correct (can be negative for groups)
-
-**PostgreSQL connection issues**
-- Verify your PostgreSQL server is running
-- Check your database credentials in `.env`
-- Ensure the database and tables are created (run `setup_db.py`)
-
-**Import errors**
-- Make sure you're in the virtual environment
-- Run `uv pip install -e .` again
-
-### Testing Telegram
-
-Quick test script:
-
-```python
-from telegram import Bot
-import asyncio
-
-async def test_telegram():
-    bot = Bot(token="YOUR_TOKEN")
-    await bot.send_message(chat_id="YOUR_CHAT_ID", text="Test message!")
-
-asyncio.run(test_telegram())
-```
-
-## 📈 Usage Examples
-
-### Basic Monitoring
 ```bash
-# Monitor with default settings
-python alert_bot.py
+# Build the image
+docker build -f docker/Dockerfile -t api-alert-system .
+
+# Run with environment variables
+docker run -d \
+  --name api-alerts \
+  --env-file .env \
+  api-alert-system
 ```
 
-### Custom Polling Interval
-Edit `config.py`:
-```python
-POLL_INTERVAL = 300  # Check every 5 minutes
-```
+## 🧪 Testing
 
-### Production Deployment
 ```bash
-# Run in background with nohup
-nohup python alert_bot.py > alerts.log 2>&1 &
+# Run all tests
+pytest
 
-# Or use screen/tmux
-screen -S stock-alerts
-python alert_bot.py
-# Ctrl+A, D to detach
+# Run with coverage
+pytest --cov=api_alert_system
+
+# Run specific tests
+pytest tests/test_telegram.py
 ```
 
-## 🛠️ Extending the System
+## 📚 Documentation
 
-### Add New Notification Channels
+- [Quick Start Guide](docs/QUICKSTART.md)
+- [MCP Integration](docs/MCP_README.md)
+- [NTFY Setup](docs/NTFY_SETUP.md)
 
-```python
-# In alert_bot.py, add to send_notification():
-async def send_notification(text):
-    # Existing Telegram code...
-    
-    # Add email
-    if EMAIL_ENABLED:
-        send_email_alert(text)
-    
-    # Add Slack
-    if SLACK_WEBHOOK:
-        send_slack_alert(text)
+## 🔧 Development
+
+### Project Structure Benefits
+
+- **Modularity**: Each component is isolated and testable
+- **Maintainability**: Clear separation of concerns
+- **Extensibility**: Easy to add new notification systems
+- **Testing**: Dedicated test directory with proper structure
+- **Documentation**: Organized documentation in docs/
+
+### Adding New Features
+
+1. **New Notification System**: Add to `src/api_alert_system/notifications/`
+2. **New Data Source**: Extend `src/api_alert_system/core/stock_monitor.py`
+3. **New Database**: Extend `src/api_alert_system/core/database.py`
+4. **New Scripts**: Add to `scripts/` directory
+
+### Code Quality
+
+```bash
+# Format code
+black src/ tests/
+
+# Lint code
+flake8 src/ tests/
+
+# Type checking
+mypy src/
 ```
 
-### Custom Alert Logic
+## 📄 License
 
-```python
-# Add to check_prices_and_alert():
-# Custom logic for percentage changes
-if latest_price > previous_price * 1.05:  # 5% increase
-    send_notification(f"{ticker} up 5%!")
-```
-
-### Database Queries
-
-```python
-# Get price history for analysis
-import psycopg2
-conn = psycopg2.connect(
-    host=config.POSTGRES_HOST,
-    port=config.POSTGRES_PORT,
-    database=config.POSTGRES_DB,
-    user=config.POSTGRES_USER,
-    password=config.POSTGRES_PASSWORD
-)
-cur = conn.cursor()
-
-# Average price last 24 hours
-cur.execute("""
-    SELECT ticker, AVG(price) 
-    FROM price_history 
-    WHERE fetched_at > NOW() - INTERVAL '1 day'
-    GROUP BY ticker
-""")
-```
-
-## 📝 License
-
-MIT License - feel free to modify and use for your own projects!
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Add tests
 5. Submit a pull request
 
-## ⚠️ Disclaimer
+## 📞 Support
 
-This tool is for educational and personal use only. Not financial advice. Use at your own risk. 
+For support and questions:
+- Open an issue on GitHub
+- Check the documentation in the `docs/` directory
+- Review the demo applications in `demos/`
