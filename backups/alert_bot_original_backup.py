@@ -17,7 +17,7 @@ try:
     telegram_available = True
 except ImportError:
     telegram_available = False
-    print("Warning: python-telegram-bot not available. Install with: pip install python-telegram-bot")
+    print("Warning: python-telegram-bot not available. Install with: uv add python-telegram-bot")
 
 # -----------------------------------------------------------------------------
 # 1) Initialize Telegram Bot (if configured)

@@ -12,7 +12,7 @@ try:
     from telegram import Bot
 except ImportError:
     print("❌ python-telegram-bot not installed!")
-    print("Run: pip install python-telegram-bot")
+    print("Run: uv add python-telegram-bot")
     sys.exit(1)
 
 async def test_telegram_bot():

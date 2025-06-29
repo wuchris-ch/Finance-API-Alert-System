@@ -4,16 +4,21 @@ FROM python:3.10-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and uv
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Add uv to PATH
+ENV PATH="/root/.cargo/bin:$PATH"
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy project files for dependency resolution
+COPY pyproject.toml uv.lock* ./
+
+# Install Python dependencies using uv
+RUN uv sync --frozen
 
 # Copy application code
 COPY . .
@@ -25,9 +30,9 @@ VOLUME ["/app/data"]
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
-# Health check
+# Health check - updated for PostgreSQL
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import sqlite3; conn = sqlite3.connect('alerts.db'); conn.close()" || exit 1
+    CMD uv run python -c "import psycopg2; import os; psycopg2.connect(host=os.getenv('POSTGRES_HOST', 'localhost'), database=os.getenv('POSTGRES_DB', 'stock_alerts'), user=os.getenv('POSTGRES_USER', 'postgres'), password=os.getenv('POSTGRES_PASSWORD', '')).close()" || exit 1
 
-# Run the application
-CMD ["python", "alert_bot.py"] 
+# Run the application using uv
+CMD ["uv", "run", "alert-bot"]

@@ -98,7 +98,7 @@ api-alert-system/
 - Uses `src/` layout for better packaging
 - Proper `__init__.py` files for imports
 - Entry points defined in `pyproject.toml`
-- Can be installed with `pip install -e .`
+- Can be installed with `uv sync`
 
 ### 4. **Organized File Structure**
 - **Scripts**: Utility scripts for setup and maintenance
@@ -114,11 +114,11 @@ api-alert-system/
 The project can now be installed as a proper Python package:
 
 ```bash
-# Install in development mode
-pip install -e .
+# Install dependencies using uv
+uv sync
 
 # Install with development dependencies
-pip install -e ".[dev]"
+uv sync --group dev
 ```
 
 ## 🚀 Running the Application

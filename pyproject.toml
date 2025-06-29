@@ -2,7 +2,7 @@
 name = "api-alert-system"
 version = "0.1.0"
 description = "Stock Alert System with Telegram Notifications and MCP Integration"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "yfinance>=0.2.28",
     "python-telegram-bot>=20.0",

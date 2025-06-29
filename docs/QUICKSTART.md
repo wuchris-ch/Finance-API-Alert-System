@@ -5,12 +5,11 @@ Get your stock alert system running in under 5 minutes!
 ## ⚡ Super Quick Setup
 
 ```bash
-# 1. Install dependencies
-python3 setup.py
+# 1. Install dependencies using uv
+uv sync
 
 # 2. Start monitoring (uses console alerts by default)
-source venv/bin/activate
-python alert_bot.py
+uv run alert-bot
 ```
 
 That's it! The system is now monitoring AAPL, TSLA, SPY, and NVDA with default thresholds.
@@ -18,8 +17,7 @@ That's it! The system is now monitoring AAPL, TSLA, SPY, and NVDA with default t
 ## 🎬 Try the Demo First
 
 ```bash
-source venv/bin/activate
-python demo.py
+uv run python demos/demo.py
 ```
 
 This runs with mock data and shows you exactly how alerts work.
@@ -50,10 +48,10 @@ WATCHLIST = {
 
 ```bash
 # View stored price history and alerts
-python inspect_db.py
+uv run inspect-db
 
-# Check what's in your database
-ls -la alerts.db
+# Check database status
+uv run python scripts/inspect_db.py
 ```
 
 ## 🐳 Run with Docker
@@ -109,8 +107,8 @@ When AAPL crosses $200:
 - Test with AAPL first
 
 **Import errors**
-- Run `python3 setup.py` again
-- Make sure you're in the virtual environment
+- Run `uv sync` again
+- Make sure dependencies are properly installed with uv
 
 **Telegram not working**
 - Verify bot token and chat ID
@@ -138,4 +136,6 @@ When AAPL crosses $200:
 
 ---
 
-**Ready to start?** Run `python3 setup.py` and you'll be monitoring stocks in minutes! 🚀 
+---
+
+**Ready to start?** Run `uv sync` and you'll be monitoring stocks in minutes! 🚀

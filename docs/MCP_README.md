@@ -7,11 +7,11 @@ This directory contains the Model Context Protocol (MCP) server for the Stock Al
 ### 1. Install Dependencies
 
 ```bash
-# Install FastMCP
-pip install fastmcp
+# Install dependencies using uv
+uv sync
 
-# Or update your existing installation
-pip install -r requirements.txt
+# Or add FastMCP if not already in dependencies
+uv add fastmcp
 ```
 
 ### 2. Run the MCP Server
@@ -165,7 +165,7 @@ result = await client.call_tool("get_price_history", {
    - Consider using demo mode for testing
 
 3. **MCP Connection Issues**
-   - Ensure FastMCP is installed: `pip install fastmcp`
+   - Ensure FastMCP is installed: `uv add fastmcp` or `uv sync`
    - Check transport configuration
    - Verify Python path in MCP client configuration
 

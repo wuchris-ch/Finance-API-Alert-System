@@ -224,11 +224,11 @@ mcp-inspector python stock_alert_mcp_server.py
 git clone <your-repo>
 cd api-alert-system
 
-# Install dependencies
-pip install -e .
+# Install dependencies using uv
+uv sync
 
 # Or install with development dependencies
-pip install -e ".[dev]"
+uv sync --group dev
 ```
 
 ### 2. Configure Your Watchlist
@@ -272,33 +272,33 @@ POLL_INTERVAL=10
 
 ```bash
 # Using the script
-python scripts/setup_db.py
+uv run python scripts/setup_db.py
 
 # Or using the entry point
-setup-db
+uv run setup-db
 ```
 
 ### 5. Run the System
 
 ```bash
 # Using the main entry point
-python main.py
+uv run python main.py
 
 # Or using the package directly
-python -m api_alert_system.core.alert_bot
+uv run python -m api_alert_system.core.alert_bot
 
 # Or using the entry point
-alert-bot
+uv run alert-bot
 ```
 
 ### 6. Test MCP Server
 
 ```bash
 # Test MCP functionality
-python test_stdio_mcp.py
+uv run python test_stdio_mcp.py
 
 # Start standalone MCP server
-python stock_alert_mcp_server.py
+uv run python stock_alert_mcp_server.py
 ```
 
 ## 🤖 MCP Integration
@@ -372,10 +372,10 @@ Try the system with mock data:
 DEMO_MODE=True
 
 # Run the system
-python main.py
+uv run python main.py
 
 # Test MCP with demo mode
-python test_stdio_mcp.py
+uv run python test_stdio_mcp.py
 ```
 
 ## 🐳 Docker Deployment
@@ -405,25 +405,25 @@ docker run -d \
 ### Core System Tests
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run with coverage
-pytest --cov=api_alert_system
+uv run pytest --cov=api_alert_system
 
 # Run specific tests
-pytest tests/test_telegram.py
+uv run pytest tests/test_telegram.py
 ```
 
 ### MCP Server Tests
 ```bash
 # Comprehensive MCP server test
-python test_stdio_mcp.py
+uv run python test_stdio_mcp.py
 
 # Test individual MCP components
-python tests/test_mcp_server.py
+uv run python tests/test_mcp_server.py
 
 # Manual MCP server validation
-python stock_alert_mcp_server.py
+uv run python stock_alert_mcp_server.py
 ```
 
 ### Testing Checklist
@@ -463,26 +463,26 @@ python stock_alert_mcp_server.py
 
 ```bash
 # Format code
-black src/ tests/
+uv run black src/ tests/
 
 # Lint code
-flake8 src/ tests/
+uv run flake8 src/ tests/
 
 # Type checking
-mypy src/
+uv run mypy src/
 ```
 
 ### MCP Development
 
 ```bash
 # Test MCP server during development
-python test_stdio_mcp.py
+uv run python test_stdio_mcp.py
 
 # Debug MCP server
-FASTMCP_LOG_LEVEL=DEBUG python stock_alert_mcp_server.py
+FASTMCP_LOG_LEVEL=DEBUG uv run python stock_alert_mcp_server.py
 
 # Validate MCP protocol compliance
-mcp-inspector python stock_alert_mcp_server.py
+mcp-inspector uv run python stock_alert_mcp_server.py
 ```
 
 ## 🚀 Production Deployment

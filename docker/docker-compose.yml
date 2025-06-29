@@ -1,20 +1,56 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15
+    container_name: stock-alerts-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=stock_alerts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   stock-alerts:
     build: .
     container_name: stock-alerts
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
-      - ./alerts.db:/app/alerts.db
-      - ./config.py:/app/config.py
+      - ./data:/app/data
+      - ./.env:/app/.env
     environment:
-      # Replace with your actual Telegram credentials
-      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN:-YOUR_BOT_TOKEN_HERE}
-      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-YOUR_CHAT_ID_HERE}
+      # Database Configuration
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=stock_alerts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+      # Notification Configuration
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - NTFY_TOPIC=${NTFY_TOPIC:-}
+      - NTFY_SERVER=${NTFY_SERVER:-https://ntfy.sh}
+      # System Configuration
+      - DEMO_MODE=${DEMO_MODE:-False}
+      - POLL_INTERVAL=${POLL_INTERVAL:-10}
     healthcheck:
-      test: ["CMD", "python", "-c", "import sqlite3; conn = sqlite3.connect('alerts.db'); conn.close()"]
+      test: ["CMD", "uv", "run", "python", "-c", "import psycopg2; import os; psycopg2.connect(host=os.getenv('POSTGRES_HOST', 'postgres'), database=os.getenv('POSTGRES_DB', 'stock_alerts'), user=os.getenv('POSTGRES_USER', 'postgres'), password=os.getenv('POSTGRES_PASSWORD', '')).close()"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s 
+      start_period: 30s
+
+volumes:
+  postgres_data:
