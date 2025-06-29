@@ -44,103 +44,64 @@ api-alert-system/
 
 ## 🏛️ System Architecture
 
+### Core System Flow
 ```mermaid
-graph TB
-    %% External APIs and Services
-    subgraph "External Services"
-        YF[Yahoo Finance API<br/>yfinance]
-        TG[Telegram Bot API]
-        NT[NTFY Server]
-        AI[AI/LLM Clients<br/>Claude Desktop, etc.]
-    end
+graph LR
+    YF[Yahoo Finance API] --> SM[Stock Monitor]
+    SM --> AB[Alert Bot]
+    AB --> DB[(Database)]
+    AB --> TG[Telegram]
+    AB --> NT[NTFY]
+    AB --> CON[Console]
     
-    %% Core Application Components
-    subgraph "API Alert System"
-        subgraph "Core Engine"
-            AB[Alert Bot<br/>Main Controller]
-            SM[Stock Monitor<br/>Price Fetcher]
-            DB[(PostgreSQL<br/>Database)]
-        end
-        
-        subgraph "Notification Layer"
-            TG_N[Telegram<br/>Notifier]
-            NT_N[NTFY<br/>Notifier]
-            CN_N[Console<br/>Notifier]
-        end
-        
-        subgraph "Configuration & Utils"
-            CFG[Config Manager<br/>Watchlist & Settings]
-        end
-        
-        subgraph "MCP Integration Layer"
-            MCP[MCP Server<br/>Model Context Protocol]
-            TOOLS[MCP Tools<br/>9 Stock Management Tools]
-            RES[MCP Resources<br/>Config & Status Data]
-        end
-    end
-    
-    %% MCP Testing Infrastructure
-    subgraph "Testing & Validation"
-        STDIO[STDIO Transport<br/>✅ Tested & Working]
-        HTTP[HTTP Transport<br/>⚠️ Configuration Issues]
-        INSPECTOR[MCP Inspector<br/>Testing Tool]
-        TEST[Test Scripts<br/>Automated Validation]
-    end
-    
-    %% Data Flow - Core System
-    YF -->|Stock Prices| SM
-    SM -->|Price Data| AB
-    AB -->|Store Data| DB
-    AB -->|Check Thresholds| CFG
-    AB -->|Send Alerts| TG_N
-    AB -->|Send Alerts| NT_N
-    AB -->|Send Alerts| CN_N
-    TG_N -->|HTTP POST| TG
-    NT_N -->|HTTP POST| NT
-    
-    %% Configuration Flow
-    CFG -->|Watchlist & Settings| AB
-    CFG -->|Thresholds| AB
-    
-    %% MCP Integration Flow
-    MCP -->|Query Interface| AB
-    MCP -->|Data Access| DB
-    MCP -->|Config Access| CFG
-    MCP -->|Expose Tools| TOOLS
-    MCP -->|Expose Resources| RES
-    
-    %% External MCP Access
-    AI -->|MCP Protocol| MCP
-    AI -->|Tool Calls| TOOLS
-    AI -->|Resource Access| RES
-    
-    %% Testing Flow
-    TEST -->|Validate| STDIO
-    TEST -->|Validate| HTTP
-    INSPECTOR -->|Inspect| MCP
-    STDIO -->|Transport| MCP
-    HTTP -->|Transport| MCP
-    
-    %% Styling
     classDef external fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef core fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
     classDef notification fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef config fill:#fff3e0,stroke:#e65100,stroke-width:2px
     classDef database fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    
+    class YF external
+    class SM,AB core
+    class TG,NT,CON notification
+    class DB database
+```
+
+### MCP Integration
+```mermaid
+graph LR
+    AI[AI/LLM Clients<br/>Claude Desktop] --> MCP[MCP Server]
+    MCP --> TOOLS[9 Stock Tools]
+    MCP --> RES[2 Resources]
+    TOOLS --> AB[Alert Bot]
+    RES --> CFG[Config]
+    
+    classDef ai fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef mcp fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef core fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef config fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    
+    class AI ai
+    class MCP,TOOLS,RES mcp
+    class AB core
+    class CFG config
+```
+
+### MCP Testing Status
+```mermaid
+graph LR
+    TEST[Test Scripts] --> STDIO[STDIO Transport ✅]
+    TEST --> HTTP[HTTP Transport ⚠️]
+    STDIO --> MCP[MCP Server]
+    HTTP -.-> MCP
+    
     classDef testing fill:#fff8e1,stroke:#f57f17,stroke-width:2px
     classDef working fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
     classDef issues fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef mcp fill:#f1f8e9,stroke:#33691e,stroke-width:2px
     
-    class YF,TG,NT,AI external
-    class AB,SM core
-    class TG_N,NT_N,CN_N notification
-    class CFG config
-    class DB database
-    class MCP,TOOLS,RES mcp
-    class INSPECTOR,TEST testing
+    class TEST testing
     class STDIO working
     class HTTP issues
+    class MCP mcp
 ```
 
 ## 🔄 Data Flow Overview
