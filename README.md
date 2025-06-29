@@ -68,7 +68,7 @@ graph LR
 ### MCP Integration
 ```mermaid
 graph LR
-    AI[Claude Desktop] --> MCP[MCP Server]
+    AI[Roo Code Sonnet 4.0] --> MCP[MCP Server]
     MCP --> TOOLS[Stock Tools]
     MCP --> RES[Resources]
     TOOLS --> AB[Alert Bot]
@@ -303,21 +303,9 @@ python stock_alert_mcp_server.py
 
 ## 🤖 MCP Integration
 
-### Using with Claude Desktop
+### Using with Roo Code
 
-Add to your Claude Desktop MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "stock-alerts": {
-      "command": "python",
-      "args": ["/path/to/your/project/stock_alert_mcp_server.py"],
-      "cwd": "/path/to/your/project"
-    }
-  }
-}
-```
+The MCP server is already integrated and working with Roo Code Sonnet 4.0. You can interact with the stock alert system directly through the MCP protocol using the available tools and resources.
 
 ### Using with Other MCP Clients
 
@@ -503,18 +491,8 @@ mcp-inspector python stock_alert_mcp_server.py
 
 For production use with AI/LLM clients:
 
-1. **Claude Desktop Integration**:
-   ```json
-   {
-     "mcpServers": {
-       "stock-alerts": {
-         "command": "python",
-         "args": ["/path/to/stock_alert_mcp_server.py"],
-         "cwd": "/path/to/project"
-       }
-     }
-   }
-   ```
+1. **Roo Code Integration**:
+   The MCP server is already configured and working with Roo Code Sonnet 4.0. The system provides direct access to stock management tools through the MCP protocol.
 
 2. **Environment Setup**:
    - Ensure all dependencies are installed
