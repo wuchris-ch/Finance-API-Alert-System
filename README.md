@@ -47,37 +47,37 @@ api-alert-system/
 ### Core System Flow
 ```mermaid
 graph LR
-    YF[Yahoo Finance API] --> SM[Stock Monitor]
-    SM --> AB[Alert Bot]
-    AB --> DB[(Database)]
-    AB --> TG[Telegram]
-    AB --> NT[NTFY]
-    AB --> CON[Console]
+    A[Yahoo Finance] --> B[Stock Monitor]
+    B --> C[Alert Bot]
+    C --> D[Database]
+    C --> E[Telegram]
+    C --> F[NTFY]
+    C --> G[Console]
     
-    classDef external fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef core fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef notification fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef database fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef external fill:#ffffff,stroke:#0066cc,stroke-width:3px,color:#000000
+    classDef core fill:#ffffff,stroke:#cc6600,stroke-width:3px,color:#000000
+    classDef notification fill:#ffffff,stroke:#009900,stroke-width:3px,color:#000000
+    classDef database fill:#ffffff,stroke:#cc0066,stroke-width:3px,color:#000000
     
-    class YF external
-    class SM,AB core
-    class TG,NT,CON notification
-    class DB database
+    class A external
+    class B,C core
+    class E,F,G notification
+    class D database
 ```
 
 ### MCP Integration
 ```mermaid
 graph LR
-    AI[AI/LLM Clients<br/>Claude Desktop] --> MCP[MCP Server]
-    MCP --> TOOLS[9 Stock Tools]
-    MCP --> RES[2 Resources]
+    AI[Claude Desktop] --> MCP[MCP Server]
+    MCP --> TOOLS[Stock Tools]
+    MCP --> RES[Resources]
     TOOLS --> AB[Alert Bot]
     RES --> CFG[Config]
     
-    classDef ai fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef mcp fill:#f1f8e9,stroke:#33691e,stroke-width:2px
-    classDef core fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef config fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef ai fill:#ffffff,stroke:#0066cc,stroke-width:3px,color:#000000
+    classDef mcp fill:#ffffff,stroke:#009900,stroke-width:3px,color:#000000
+    classDef core fill:#ffffff,stroke:#cc6600,stroke-width:3px,color:#000000
+    classDef config fill:#ffffff,stroke:#cc0066,stroke-width:3px,color:#000000
     
     class AI ai
     class MCP,TOOLS,RES mcp
@@ -88,15 +88,15 @@ graph LR
 ### MCP Testing Status
 ```mermaid
 graph LR
-    TEST[Test Scripts] --> STDIO[STDIO Transport ✅]
-    TEST --> HTTP[HTTP Transport ⚠️]
+    TEST[Test Scripts] --> STDIO[STDIO Working]
+    TEST --> HTTP[HTTP Issues]
     STDIO --> MCP[MCP Server]
     HTTP -.-> MCP
     
-    classDef testing fill:#fff8e1,stroke:#f57f17,stroke-width:2px
-    classDef working fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
-    classDef issues fill:#ffebee,stroke:#c62828,stroke-width:2px
-    classDef mcp fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef testing fill:#ffffff,stroke:#666666,stroke-width:3px,color:#000000
+    classDef working fill:#ffffff,stroke:#009900,stroke-width:4px,color:#000000
+    classDef issues fill:#ffffff,stroke:#cc0000,stroke-width:3px,color:#000000
+    classDef mcp fill:#ffffff,stroke:#0066cc,stroke-width:3px,color:#000000
     
     class TEST testing
     class STDIO working
